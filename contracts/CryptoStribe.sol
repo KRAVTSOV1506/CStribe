@@ -1398,7 +1398,7 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function WithdrawComision(
+    function WithdrawCommision(
         address ERC20_address,
         bool is_native_token
     ) public onlyOwner returns (bool) {
