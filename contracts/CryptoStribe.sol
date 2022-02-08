@@ -1047,225 +1047,10 @@ library EnumerableMap {
     }
 }
 
-
-/**
- * @dev Wrappers over Solidity's arithmetic operations.
- *
- * NOTE: `SafeMath` is generally not needed starting with Solidity 0.8, since the compiler
- * now has built in overflow checking.
- */
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            uint256 c = a + b;
-            if (c < a) return (false, 0);
-            return (true, c);
-        }
-    }
-
-    /**
-     * @dev Returns the substraction of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b > a) return (false, 0);
-            return (true, a - b);
-        }
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-            // benefit is lost if 'b' is also tested.
-            // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-            if (a == 0) return (true, 0);
-            uint256 c = a * b;
-            if (c / a != b) return (false, 0);
-            return (true, c);
-        }
-    }
-
-    /**
-     * @dev Returns the division of two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b == 0) return (false, 0);
-            return (true, a / b);
-        }
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.
-     *
-     * _Available since v3.4._
-     */
-    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {
-        unchecked {
-            if (b == 0) return (false, 0);
-            return (true, a % b);
-        }
-    }
-
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     *
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a + b;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a - b;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     *
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a * b;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator.
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a / b;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a % b;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {trySub}.
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b <= a, errorMessage);
-            return a - b;
-        }
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers, reverting with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b > 0, errorMessage);
-            return a / b;
-        }
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * reverting with custom message when dividing by zero.
-     *
-     * CAUTION: This function is deprecated because it requires allocating memory for the error
-     * message unnecessarily. For custom revert reasons use {tryMod}.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(
-        uint256 a,
-        uint256 b,
-        string memory errorMessage
-    ) internal pure returns (uint256) {
-        unchecked {
-            require(b > 0, errorMessage);
-            return a % b;
-        }
-    }
-}
+// TODO: refactor
+// TODO: add require(if they need)
+// TODO: add comments
+// TODO: add emits
 
 contract CryptoStribe is Context, Ownable {
     enum PaymentType {
@@ -1274,7 +1059,7 @@ contract CryptoStribe is Context, Ownable {
     }
 
     struct Payment {
-        address payable service_provider_address;
+        address service_provider_address;
         address ERC20_address;
         bool is_native_token;
         uint256 price;
@@ -1288,6 +1073,7 @@ contract CryptoStribe is Context, Ownable {
 
     enum PaymentStatus {
         CREATED,
+        TRIAL,
         ACTIVE,
         DECLINE,
         CANCELED
@@ -1307,7 +1093,18 @@ contract CryptoStribe is Context, Ownable {
 
     Payer[] private _payers;
     mapping(uint256 => mapping(uint256 => uint256)) private _payment_id_billing_id_to_payer_id;
+    mapping(address => mapping(address => uint256)) private _service_provider_ERC20_earnings;
+    mapping(address => uint256) private _service_provider_native_earnings;
+    
+    uint256 comission = 10; // Commision percent
+    mapping(address => mapping(address => uint256)) private _commission_ERC20_earnings;
+    mapping(address => uint256) private _commission_native_earnings;
 
+    constructor() {
+    }
+
+    receive() payable external {
+    }
 
     function CreatePayment(
         address ERC20_address,
@@ -1322,7 +1119,8 @@ contract CryptoStribe is Context, Ownable {
             !is_native_token && ERC20_address != address(0),
             "Payment is possible only in native tokens, or only in ERC20"
         );
-        address payable service_provider_address = payable(_msgSender());
+
+        address service_provider_address = _msgSender();
         payment_id = _payments.length;
         _payments.push(
             Payment(
@@ -1410,6 +1208,32 @@ contract CryptoStribe is Context, Ownable {
         return payments;
     }
 
+    function _AmountWithCommision(
+        uint256 amount
+    ) private view returns (uint256) {
+        return amount * 100 / comission;
+    }
+
+    function SendECR20Tokens(
+        address ERC20_address,
+        address sender,
+        address recipient,
+        uint256 amount,
+        address service_provider_address
+    ) private returns (bool) {
+        bool complite = IERC20(ERC20_address).transferFrom(
+                sender,
+                recipient,
+                amount
+        );
+
+        if (complite) {
+            _service_provider_ERC20_earnings[service_provider_address][ERC20_address] += _AmountWithCommision(amount);
+        }
+
+        return complite;
+    }
+
     function ApprovePayment(
         uint256 payment_id,
         uint256 billing_id
@@ -1426,7 +1250,175 @@ contract CryptoStribe is Context, Ownable {
             "Not enough approved tokens"
         );
 
+        _payers.push(
+            Payer(
+                payment_id,
+                _msgSender(),
+                billing_id,
+                block.timestamp,
+                _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
+                _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE
+            )
+        );
 
+        if (
+            _payments[payment_id].payment_type == PaymentType.ONE_TIME_PAYMENT &&
+            _payments[payment_id].is_native_token
+        ) {
+            _service_provider_native_earnings[_payments[payment_id].service_provider_address] += _AmountWithCommision(_payments[payment_id].price);
+
+            return true;
+        }
+
+        if (
+            !_payments[payment_id].is_native_token &&
+            _payments[payment_id].trial_time == 0
+        ) {
+            return SendECR20Tokens(
+                _payments[payment_id].ERC20_address,
+                _msgSender(),
+                address(this),
+                _payments[payment_id].price,
+                _payments[payment_id].service_provider_address
+            );
+        }
+
+        if (
+             _payments[payment_id].payment_type == PaymentType.SUBSCRIPTION &&
+             _payments[payment_id].trial_time > 0
+        ) {
+            return true;
+        }
+
+        revert();
+    }
+
+    function ExcuteSubscription(
+        uint256 payment_id,
+        uint256 billing_id
+    ) public returns (bool) {
+        require(
+            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
+            "Payer not found"
+        );
+        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+        require(
+            _payers[payer_id].payment_status == PaymentStatus.ACTIVE &&
+            _payers[payer_id].last_payment_timestamp + _payments[payment_id].payment_period >=
+            block.timestamp ||
+            _payers[payer_id].payment_status == PaymentStatus.TRIAL &&
+            _payers[payer_id].last_payment_timestamp + _payments[payment_id].trial_time >=
+            block.timestamp ||
+            _payers[payer_id].payment_status == PaymentStatus.DECLINE,
+            "Payment time has not yet arrived"
+        );
+
+        bool complite = SendECR20Tokens(
+            _payments[payment_id].ERC20_address,
+            _payers[payer_id].billing_address,
+            address(this),
+            _payments[payment_id].price,
+            _payments[payment_id].service_provider_address
+        );
+
+        if (complite) {
+            _payers[payer_id].last_payment_timestamp = block.timestamp;
+            
+            if (
+                _payers[payer_id].payment_status == PaymentStatus.TRIAL ||
+                _payers[payer_id].payment_status == PaymentStatus.DECLINE
+            ) {
+                _payers[payer_id].payment_status == PaymentStatus.ACTIVE;
+            }
+        } else {
+            _payers[payer_id].payment_status = PaymentStatus.DECLINE;
+        }
+
+        return true;
+    }
+
+    function CancelSubscription(
+        uint256 payment_id,
+        uint256 billing_id
+    ) public returns (bool) {
+        require(
+            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
+            "Payer not found"
+        );
+        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+        require(
+            _payers[payer_id].billing_address == _msgSender(),
+            "You are not this payer"
+        );
+        
+        _payers[payer_id].payment_status = PaymentStatus.CANCELED;
+
+        return true;
+    }
+
+    function GetPayerStatus(
+        uint256 payment_id,
+        uint256 billing_id
+    ) public view returns(PaymentStatus) {
+        require(
+            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
+            "Payer not found"
+        );
+        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+        
+        return _payers[payer_id].payment_status;
+    }
+
+    function Withdraw(
+        uint256 payment_id
+    ) public returns (bool) {
+        require(
+            _payments[payment_id].service_provider_address == _msgSender(),
+            "You are not this service provider"
+        );
+        address ERC20_address = _payments[payment_id].ERC20_address;
+        require(
+            _service_provider_native_earnings[_msgSender()] > 0 ||
+            _service_provider_ERC20_earnings[_msgSender()][ERC20_address] > 0,
+            "No tokens"
+        );
+
+        if (_payments[payment_id].is_native_token) {
+            uint256 balance = _service_provider_native_earnings[_msgSender()];
+            payable(_msgSender()).transfer(balance);
+            _service_provider_native_earnings[_msgSender()] = 0;
+        } else {
+            IERC20(ERC20_address).transfer(
+                _msgSender(),
+                _service_provider_ERC20_earnings[_msgSender()][ERC20_address]
+            );
+            _service_provider_ERC20_earnings[_msgSender()][ERC20_address] = 0;
+        }
+
+        return true;
+    }
+
+    function WithdrawComision(
+        address ERC20_address,
+        bool is_native_token
+    ) public onlyOwner returns (bool) {
+        require(
+            is_native_token && _commission_native_earnings[_msgSender()] > 0 ||
+            !is_native_token && _commission_ERC20_earnings[_msgSender()][ERC20_address] > 0,
+            "No tokens"
+        );
+
+        if (is_native_token) {
+            uint256 balance = _commission_native_earnings[_msgSender()];
+            payable(_msgSender()).transfer(balance);
+            _commission_native_earnings[_msgSender()] = 0;
+        } else {
+            IERC20(ERC20_address).transfer(
+                _msgSender(),
+                _commission_ERC20_earnings[_msgSender()][ERC20_address]
+            );
+            _commission_ERC20_earnings[_msgSender()][ERC20_address] = 0;
+        }
 
         return true;
     }
