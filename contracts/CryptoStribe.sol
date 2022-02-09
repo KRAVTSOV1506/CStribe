@@ -542,11 +542,11 @@ contract CryptoStribe is Context, Ownable {
         return payments;
     }
 
-    function _AmountWithCommision(
+    function _AmountWithCommission(
         uint256 amount
     ) private view returns (uint256, uint256) {
-        uint256 commision = amount * comission_precent / 100;
-        return (amount - commision, commision);
+        uint256 commission = amount * comission_precent / 100;
+        return (amount - commission, commission);
     }
 
     function SendECR20Tokens(
@@ -564,10 +564,10 @@ contract CryptoStribe is Context, Ownable {
 
         if (complite) {
             uint256 pay;
-            uint256 commision;
-            (pay, commision) = _AmountWithCommision(amount);
+            uint256 commission;
+            (pay, commission) = _AmountWithCommission(amount);
             _service_provider_ERC20_earnings[service_provider_address][ERC20_address] += pay;
-            _commission_ERC20_earnings[ERC20_address] += commision;
+            _commission_ERC20_earnings[ERC20_address] += commission;
         }
 
         return complite;
@@ -605,10 +605,10 @@ contract CryptoStribe is Context, Ownable {
             _payments[payment_id].is_native_token
         ) {
             uint256 pay;
-            uint256 commision;
-            (pay, commision) = _AmountWithCommision(_payments[payment_id].price);
+            uint256 commission;
+            (pay, commission) = _AmountWithCommission(_payments[payment_id].price);
             _service_provider_native_earnings[_payments[payment_id].service_provider_address] += pay;
-            _commission_native_earnings += commision;
+            _commission_native_earnings += commission;
 
             return true;
         }
@@ -729,7 +729,7 @@ contract CryptoStribe is Context, Ownable {
         return _service_provider_ERC20_earnings[service_provider_address][_payments[payment_id].ERC20_address];
     }
 
-    function GetCommisions(
+    function GetCommissions(
         bool is_native_token,
         address ERC20_address
     ) public view returns (uint256) {
@@ -775,7 +775,7 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function WithdrawCommision(
+    function WithdrawCommission(
         address ERC20_address,
         bool is_native_token
     ) public onlyOwner returns (bool) {
