@@ -785,24 +785,23 @@ contract CryptoStribe is Context, Ownable {
     }
 
     function Withdraw(
-        uint256 payment_id
-    ) public paymentIdCheck(payment_id) returns (bool) {
+        bool is_native_token,
+        address ERC20_address
+    ) public returns (bool) {
         require(
-            _payments[payment_id].service_provider_address == _msgSender(),
-            "You are not this service provider"
-        );
-        address ERC20_address = _payments[payment_id].ERC20_address;
-        require(
+            is_native_token &&
             _service_provider_native_earnings[_msgSender()] > 0 ||
+            !is_native_token &&
             _service_provider_ERC20_earnings[_msgSender()][ERC20_address] > 0,
             "No tokens"
         );
 
-        if (_payments[payment_id].is_native_token) {
+        if (is_native_token && _service_provider_native_earnings[_msgSender()] > 0) {
             uint256 balance = _service_provider_native_earnings[_msgSender()];
             payable(_msgSender()).transfer(balance);
             _service_provider_native_earnings[_msgSender()] = 0;
-        } else {
+        } 
+        if (!is_native_token && _service_provider_ERC20_earnings[_msgSender()][ERC20_address] > 0) {
             IERC20(ERC20_address).transfer(
                 _msgSender(),
                 _service_provider_ERC20_earnings[_msgSender()][ERC20_address]
