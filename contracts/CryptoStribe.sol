@@ -394,6 +394,14 @@ contract CryptoStribe is Context, Ownable {
         _;
     }
 
+    modifier paymentActiveCheck(uint256 payment_id) {
+        require(
+            _payments[payment_id].is_active,
+            "This payment not active now"
+        );
+        _;
+    }
+
     event PaymentCreated(
 
     );
@@ -454,14 +462,13 @@ contract CryptoStribe is Context, Ownable {
     }
 
     Payment[] private _payments;
-    mapping(address => uint256[]) private _sevice_provider_address_to_payments_ids;
 
     Payer[] private _payers;
     mapping(uint256 => mapping(uint256 => uint256)) private _payment_id_billing_id_to_payer_id;
     mapping(address => mapping(address => uint256)) private _service_provider_ERC20_earnings;
     mapping(address => uint256) private _service_provider_native_earnings;
     
-    uint256 comission_precent = 10;
+    uint256 public comission_precent = 10;
     mapping(address => uint256) private _commission_ERC20_earnings;
     uint256 private _commission_native_earnings;
 
@@ -594,7 +601,6 @@ contract CryptoStribe is Context, Ownable {
                 true
             )
         );
-        _sevice_provider_address_to_payments_ids[service_provider_address].push(payment_id);
 
         return payment_id;
     }
@@ -647,7 +653,7 @@ contract CryptoStribe is Context, Ownable {
     function ApprovePayment(
         uint256 payment_id,
         uint256 billing_id
-    ) public payable paymentIdCheck(payment_id) returns (bool) {
+    ) public payable paymentIdCheck(payment_id) paymentActiveCheck(payment_id) returns (bool) {
         require(
             _payments[payment_id].is_native_token && msg.value ==_payments[payment_id].price ||
             !_payments[payment_id].is_native_token &&
@@ -706,7 +712,7 @@ contract CryptoStribe is Context, Ownable {
     function ExcuteSubscription(
         uint256 payment_id,
         uint256 billing_id
-    ) public returns (bool) {
+    ) public paymentActiveCheck(payment_id) returns (bool) {
         uint256 payer_id = _GetPayerId(payment_id, billing_id);
         require(
             _payers[payer_id].payment_status == PaymentStatus.ACTIVE &&
