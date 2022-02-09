@@ -386,6 +386,38 @@ abstract contract Ownable is Context {
 contract CryptoStribe is Context, Ownable {
     using Address for address;
 
+    modifier paymentIdCheck(uint256 payment_id) {
+        require(
+            0 <= payment_id && payment_id <= GetPaymentsLength(),
+            "Incorrect payment id"
+        );
+        _;
+    }
+
+    event PaymentCreated(
+
+    );
+
+    event PaymentDeactivated(
+
+    );
+
+    event PaymentActivated(
+        
+    );
+
+    event PaymentApproved(
+
+    );
+
+    event PaymentExecuted(
+
+    );
+
+    event PaymentCanceled(
+
+    );
+
     enum PaymentType {
         SUBSCRIPTION,
         ONE_TIME_PAYMENT
@@ -434,10 +466,102 @@ contract CryptoStribe is Context, Ownable {
     uint256 private _commission_native_earnings;
 
     constructor() {
+        _payers.push({});
+        _payments.push({});
     }
 
     receive() payable external {
         _service_provider_native_earnings[owner()] += msg.value;
+    }
+
+    function _AmountWithCommission(
+        uint256 amount
+    ) private view returns (uint256, uint256) {
+        uint256 commission = amount * comission_precent / 100;
+        return (amount - commission, commission);
+    }
+
+    function _GetPayerId(
+        uint256 payment_id,
+        uint256 billing_id
+    ) private view returns (uint256) {
+        require(
+            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
+            "Payer not found"
+        );
+        return _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+    }
+
+    function GetPaymentsLength() public view returns (uint256) {
+        return _payments.length;
+    }
+
+    function IsPaymentActive(uint256 payment_id) public view returns (bool) {
+        return _payments[payment_id].is_active;
+    }
+
+    function GetPayment(uint256 payment_id) public view paymentIdCheck(payment_id) returns (Payment memory) {
+        return _payments[payment_id];
+    }
+
+    function GetPayments(
+        uint256 from, 
+        uint256 to
+    ) public view returns (Payment[] memory) {
+        require(
+            0 <= from && from < to && to <= GetPaymentsLength(), 
+            "Incorrect segment"
+        );
+        Payment[] memory payments = new Payment[](to - from);
+
+        for (uint256 i = from; i < to; i++) {
+            payments[i - from] = _payments[i];
+        }
+
+        return payments;
+    }
+
+    function GetPayer(
+        uint256 payment_id,
+        uint256 billing_id
+    ) public view returns(Payer memory) {   
+        return _payers[_GetPayerId(payment_id, billing_id)];
+    }
+
+    function GetPayerStatus(
+        uint256 payment_id,
+        uint256 billing_id
+    ) public view returns(PaymentStatus) {
+        return _payers[_GetPayerId(payment_id, billing_id)].payment_status;
+    }
+
+    function GetServiceProviderEarnings(
+        uint256 payment_id
+    ) public view paymentIdCheck(payment_id) returns (uint256) {        
+        address service_provider_address = _payments[payment_id].service_provider_address;
+
+        if (_payments[payment_id].is_native_token) {
+            return _service_provider_native_earnings[service_provider_address];
+        }
+        
+        return _service_provider_ERC20_earnings[service_provider_address][_payments[payment_id].ERC20_address];
+    }
+
+    function GetCommissions(
+        bool is_native_token,
+        address ERC20_address
+    ) public view returns (uint256) {
+        require(
+            is_native_token && ERC20_address == address(0) ||
+            !is_native_token && ERC20_address != address(0) && ERC20_address.isContract(),
+            "Payment is possible only in native tokens, or only in ERC20"
+        );
+        
+        if (is_native_token) {
+            return _commission_native_earnings;
+        }
+        
+        return _commission_ERC20_earnings[ERC20_address];
     }
 
     function CreatePayment(
@@ -475,24 +599,7 @@ contract CryptoStribe is Context, Ownable {
         return payment_id;
     }
 
-    function GetPaymentsLength() public view returns (uint256) {
-        return _payments.length;
-    }
-
-    function IsPaymentActive(uint256 payment_id) public view returns (bool) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
-
-        return _payments[payment_id].is_active;
-    }
-
-    function DeactivatePayment(uint256 payment_id) public onlyOwner returns (bool) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
+    function DeactivatePayment(uint256 payment_id) public onlyOwner paymentIdCheck(payment_id) returns (bool) {
         require(
             IsPaymentActive(payment_id) == true,
             "This payment already deactivated"
@@ -503,11 +610,7 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function ActivatePayment(uint256 payment_id) public onlyOwner returns (bool) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
+    function ActivatePayment(uint256 payment_id) public onlyOwner paymentIdCheck(payment_id) returns (bool) {
         require(
             IsPaymentActive(payment_id) == false,
             "This payment already active"
@@ -515,38 +618,6 @@ contract CryptoStribe is Context, Ownable {
         _payments[payment_id].is_active = true;
 
         return true;
-    }
-
-    function GetPayment(uint256 payment_id) public view returns (Payment memory) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
-        return _payments[payment_id];
-    }
-
-    function GetPayments(
-        uint256 from, 
-        uint256 to
-    ) public view returns (Payment[] memory) {
-        require(
-            0 <= from && from < to && to <= GetPaymentsLength(), 
-            "Incorrect segment"
-        );
-        Payment[] memory payments = new Payment[](to - from);
-
-        for (uint256 i = from; i < to; i++) {
-            payments[i - from] = _payments[i];
-        }
-
-        return payments;
-    }
-
-    function _AmountWithCommission(
-        uint256 amount
-    ) private view returns (uint256, uint256) {
-        uint256 commission = amount * comission_precent / 100;
-        return (amount - commission, commission);
     }
 
     function SendECR20Tokens(
@@ -576,11 +647,7 @@ contract CryptoStribe is Context, Ownable {
     function ApprovePayment(
         uint256 payment_id,
         uint256 billing_id
-    ) public payable returns (bool) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
+    ) public payable paymentIdCheck(payment_id) returns (bool) {
         require(
             _payments[payment_id].is_native_token && msg.value ==_payments[payment_id].price ||
             !_payments[payment_id].is_native_token &&
@@ -640,11 +707,7 @@ contract CryptoStribe is Context, Ownable {
         uint256 payment_id,
         uint256 billing_id
     ) public returns (bool) {
-        require(
-            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
-            "Payer not found"
-        );
-        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+        uint256 payer_id = _GetPayerId(payment_id, billing_id);
         require(
             _payers[payer_id].payment_status == PaymentStatus.ACTIVE &&
             _payers[payer_id].last_payment_timestamp + _payments[payment_id].payment_period >=
@@ -680,15 +743,31 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
+    function ExcuteSubscriptions(
+        uint256[] memory payment_ids,
+        uint256[] memory billing_ids
+    ) public returns (bool) {
+        require(
+            payment_ids.length == billing_ids.length,
+            "Arrays must have the same length"
+        );
+        require(
+            payment_ids.length <= 20,
+            "Length must be less than 20"
+        );
+
+        for (uint256 i = 0; i < payment_ids.length; i++) {
+            ExcuteSubscription(payment_ids[i], billing_ids[i]);
+        }
+
+        return true;
+    }
+
     function CancelSubscription(
         uint256 payment_id,
         uint256 billing_id
     ) public returns (bool) {
-        require(
-            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
-            "Payer not found"
-        );
-        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
+        uint256 payer_id = _GetPayerId(payment_id, billing_id);
         require(
             _payers[payer_id].billing_address == _msgSender(),
             "You are not this payer"
@@ -699,56 +778,9 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function GetPayerStatus(
-        uint256 payment_id,
-        uint256 billing_id
-    ) public view returns(PaymentStatus) {
-        require(
-            _payment_id_billing_id_to_payer_id[payment_id][billing_id] != 0,
-            "Payer not found"
-        );
-        uint256 payer_id = _payment_id_billing_id_to_payer_id[payment_id][billing_id];
-        
-        return _payers[payer_id].payment_status;
-    }
-
-    function GetServiceProviderEarnings(
-        uint256 payment_id
-    ) public view returns (uint256) {
-        require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
-            "Incorrect payment id"
-        );
-        
-        address service_provider_address = _payments[payment_id].service_provider_address;
-
-        if (_payments[payment_id].is_native_token) {
-            return _service_provider_native_earnings[service_provider_address];
-        }
-        
-        return _service_provider_ERC20_earnings[service_provider_address][_payments[payment_id].ERC20_address];
-    }
-
-    function GetCommissions(
-        bool is_native_token,
-        address ERC20_address
-    ) public view returns (uint256) {
-        require(
-            is_native_token && ERC20_address == address(0) ||
-            !is_native_token && ERC20_address != address(0) && ERC20_address.isContract(),
-            "Payment is possible only in native tokens, or only in ERC20"
-        );
-        
-        if (is_native_token) {
-            return _commission_native_earnings;
-        }
-        
-        return _commission_ERC20_earnings[ERC20_address];
-    }
-
     function Withdraw(
         uint256 payment_id
-    ) public returns (bool) {
+    ) public paymentIdCheck(payment_id) returns (bool) {
         require(
             _payments[payment_id].service_provider_address == _msgSender(),
             "You are not this service provider"
