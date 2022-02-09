@@ -516,7 +516,7 @@ contract CryptoStribe is Context, Ownable {
         uint256 to
     ) public view returns (Payment[] memory) {
         require(
-            0 <= from && from < to && to <= GetPaymentsLength(), 
+            0 < from && from < to && to <= GetPaymentsLength(), 
             "Incorrect segment"
         );
         Payment[] memory payments = new Payment[](to - from);
