@@ -388,7 +388,7 @@ contract CryptoStribe is Context, Ownable {
 
     modifier paymentIdCheck(uint256 payment_id) {
         require(
-            0 <= payment_id && payment_id <= GetPaymentsLength(),
+            0 <= payment_id && payment_id < GetPaymentsLength(),
             "Incorrect payment id"
         );
         _;
