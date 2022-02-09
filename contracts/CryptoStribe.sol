@@ -626,7 +626,7 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function SendECR20Tokens(
+    function SendERC20Tokens(
         address ERC20_address,
         address sender,
         address recipient,
@@ -690,7 +690,7 @@ contract CryptoStribe is Context, Ownable {
             !_payments[payment_id].is_native_token &&
             _payments[payment_id].trial_time == 0
         ) {
-            return SendECR20Tokens(
+            return SendERC20Tokens(
                 _payments[payment_id].ERC20_address,
                 _msgSender(),
                 address(this),
@@ -725,7 +725,7 @@ contract CryptoStribe is Context, Ownable {
             "Payment time has not yet arrived"
         );
 
-        bool complite = SendECR20Tokens(
+        bool complite = SendERC20Tokens(
             _payments[payment_id].ERC20_address,
             _payers[payer_id].billing_address,
             address(this),
