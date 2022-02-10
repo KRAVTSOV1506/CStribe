@@ -476,6 +476,7 @@ contract CryptoStribe is Context, Ownable {
         uint256 creation_timestamp;
         uint256 last_payment_timestamp;
         PaymentStatus payment_status;
+        uint256 payer_id;
     }
 
     Payment[] private _payments;
@@ -695,6 +696,8 @@ contract CryptoStribe is Context, Ownable {
             "Not enough approved tokens"
         );
 
+        uint256 payer_id = _payers.length;
+
         _payers.push(
             Payer(
                 payment_id,
@@ -702,9 +705,12 @@ contract CryptoStribe is Context, Ownable {
                 billing_id,
                 block.timestamp,
                 _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
-                _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE
+                _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE,
+                payer_id
             )
         );
+
+        _payment_id_billing_id_to_payer_id[payment_id][billing_id] = payer_id;
 
         emit PaymentApproved(
             payment_id,
