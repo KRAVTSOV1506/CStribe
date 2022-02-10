@@ -403,27 +403,44 @@ contract CryptoStribe is Context, Ownable {
     }
 
     event PaymentCreated(
-
+        address indexed service_provider_address,
+        address ERC20_address,
+        bool is_native_token,
+        uint256 price,
+        PaymentType indexed payment_type,
+        uint256 creation_timestamp,
+        uint256 trial_time,
+        uint256 payment_period,
+        uint256 indexed payment_id
     );
 
     event PaymentDeactivated(
-
+        uint256 indexed payment_id
     );
 
     event PaymentActivated(
-        
+        uint256 indexed payment_id
     );
 
     event PaymentApproved(
-
+        uint256 indexed payment_id,
+        address indexed billing_address,
+        uint256 indexed billing_id,
+        uint256 creation_timestamp,
+        uint256 last_payment_timestamp,
+        PaymentStatus payment_status
     );
 
     event PaymentExecuted(
-
+        uint256 indexed payment_id,
+        address indexed billing_address,
+        uint256 indexed billing_id
     );
 
-    event PaymentCanceled(
-
+    event SubscriptionCanceled(
+        uint256 indexed payment_id,
+        address indexed billing_address,
+        uint256 indexed billing_id
     );
 
     enum PaymentType {
@@ -602,6 +619,18 @@ contract CryptoStribe is Context, Ownable {
             )
         );
 
+        emit PaymentCreated(
+            service_provider_address,
+            ERC20_address,
+            is_native_token,
+            price,
+            payment_type,
+            block.timestamp,
+            trial_time,
+            payment_period,
+            payment_id
+        );
+
         return payment_id;
     }
 
@@ -613,6 +642,8 @@ contract CryptoStribe is Context, Ownable {
 
         _payments[payment_id].is_active = false;
 
+        emit PaymentDeactivated(payment_id);
+
         return true;
     }
 
@@ -622,6 +653,8 @@ contract CryptoStribe is Context, Ownable {
             "This payment already active"
         );
         _payments[payment_id].is_active = true;
+
+        emit PaymentActivated(payment_id);
 
         return true;
     }
@@ -671,6 +704,15 @@ contract CryptoStribe is Context, Ownable {
                 _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
                 _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE
             )
+        );
+
+        emit PaymentApproved(
+            payment_id,
+            _msgSender(),
+            billing_id,
+            block.timestamp,
+            _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
+            _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE
         );
 
         if (
@@ -746,6 +788,12 @@ contract CryptoStribe is Context, Ownable {
             _payers[payer_id].payment_status = PaymentStatus.DECLINE;
         }
 
+        emit PaymentExecuted(
+            payment_id,
+            _payers[payer_id].billing_address,
+            billing_id
+        );
+
         return true;
     }
 
@@ -781,6 +829,12 @@ contract CryptoStribe is Context, Ownable {
         
         _payers[payer_id].payment_status = PaymentStatus.CANCELED;
 
+        emit SubscriptionCanceled(
+            payment_id,
+            _payers[payer_id].billing_address,
+            billing_id
+        );
+
         return true;
     }
 
@@ -800,7 +854,7 @@ contract CryptoStribe is Context, Ownable {
             uint256 balance = _service_provider_native_earnings[_msgSender()];
             payable(_msgSender()).transfer(balance);
             _service_provider_native_earnings[_msgSender()] = 0;
-        } 
+        }
         if (!is_native_token && _service_provider_ERC20_earnings[_msgSender()][ERC20_address] > 0) {
             IERC20(ERC20_address).transfer(
                 _msgSender(),
