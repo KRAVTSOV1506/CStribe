@@ -443,6 +443,12 @@ contract CryptoStribe is Context, Ownable {
         uint256 indexed billing_id
     );
 
+    event WithdrawSuccessful(
+        address indexed recipient,
+        bool is_native_token,
+        uint256 timestamp
+    );
+
     enum PaymentType {
         SUBSCRIPTION,
         ONE_TIME_PAYMENT
@@ -869,6 +875,8 @@ contract CryptoStribe is Context, Ownable {
             _service_provider_ERC20_earnings[_msgSender()][ERC20_address] = 0;
         }
 
+        emit WithdrawSuccessful(msg.sender, is_native_token, block.timestamp);
+
         return true;
     }
 
@@ -893,6 +901,8 @@ contract CryptoStribe is Context, Ownable {
             );
             _commission_ERC20_earnings[ERC20_address] = 0;
         }
+
+        emit WithdrawSuccessful(msg.sender, is_native_token, block.timestamp);
 
         return true;
     }
