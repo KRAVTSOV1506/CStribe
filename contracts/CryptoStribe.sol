@@ -770,10 +770,10 @@ contract CryptoStribe is Context, Ownable {
         uint256 payer_id = _GetPayerId(payment_id, billing_id);
         require(
             _payers[payer_id].payment_status == PaymentStatus.ACTIVE &&
-            _payers[payer_id].last_payment_timestamp + _payments[payment_id].payment_period >=
+            _payers[payer_id].last_payment_timestamp + _payments[payment_id].payment_period <=
             block.timestamp ||
             _payers[payer_id].payment_status == PaymentStatus.TRIAL &&
-            _payers[payer_id].last_payment_timestamp + _payments[payment_id].trial_time >=
+            _payers[payer_id].last_payment_timestamp + _payments[payment_id].trial_time <=
             block.timestamp ||
             _payers[payer_id].payment_status == PaymentStatus.DECLINE,
             "Payment time has not yet arrived"
