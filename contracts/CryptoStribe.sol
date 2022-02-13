@@ -875,7 +875,7 @@ contract CryptoStribe is Context, Ownable {
             _service_provider_ERC20_earnings[_msgSender()][ERC20_address] = 0;
         }
 
-        emit WithdrawSuccessful(msg.sender, is_native_token, block.timestamp);
+        emit WithdrawSuccessful(_msgSender(), is_native_token, block.timestamp);
 
         return true;
     }
@@ -902,7 +902,7 @@ contract CryptoStribe is Context, Ownable {
             _commission_ERC20_earnings[ERC20_address] = 0;
         }
 
-        emit WithdrawSuccessful(msg.sender, is_native_token, block.timestamp);
+        emit WithdrawSuccessful(_msgSender(), is_native_token, block.timestamp);
 
         return true;
     }
