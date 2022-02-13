@@ -710,7 +710,7 @@ contract CryptoStribe is Context, Ownable {
                 _msgSender(),
                 billing_id,
                 block.timestamp,
-                _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
+                block.timestamp,
                 _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE,
                 payer_id
             )
