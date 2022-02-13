@@ -723,7 +723,7 @@ contract CryptoStribe is Context, Ownable {
             _msgSender(),
             billing_id,
             block.timestamp,
-            _payments[payment_id].trial_time > 0 ? 0 : block.timestamp,
+            block.timestamp,
             _payments[payment_id].trial_time > 0 ? PaymentStatus.TRIAL : PaymentStatus.ACTIVE
         );
 
@@ -789,13 +789,7 @@ contract CryptoStribe is Context, Ownable {
 
         if (complite) {
             _payers[payer_id].last_payment_timestamp = block.timestamp;
-            
-            if (
-                _payers[payer_id].payment_status == PaymentStatus.TRIAL ||
-                _payers[payer_id].payment_status == PaymentStatus.DECLINE
-            ) {
-                _payers[payer_id].payment_status == PaymentStatus.ACTIVE;
-            }
+            _payers[payer_id].payment_status = PaymentStatus.ACTIVE;
         } else {
             _payers[payer_id].payment_status = PaymentStatus.DECLINE;
         }
