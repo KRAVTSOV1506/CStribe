@@ -763,7 +763,7 @@ contract CryptoStribe is Context, Ownable {
         revert();
     }
 
-    function ExcuteSubscription(
+    function ExecuteSubscription(
         uint256 payment_id,
         uint256 billing_id
     ) public paymentActiveCheck(payment_id) returns (bool) {
@@ -803,7 +803,7 @@ contract CryptoStribe is Context, Ownable {
         return true;
     }
 
-    function ExcuteSubscriptions(
+    function ExecuteSubscriptions(
         uint256[] memory payment_ids,
         uint256[] memory billing_ids
     ) public returns (bool) {
@@ -817,7 +817,7 @@ contract CryptoStribe is Context, Ownable {
         );
 
         for (uint256 i = 0; i < payment_ids.length; i++) {
-            ExcuteSubscription(payment_ids[i], billing_ids[i]);
+            ExecuteSubscription(payment_ids[i], billing_ids[i]);
         }
 
         return true;
