@@ -695,6 +695,10 @@ contract CryptoStribe is Context, Ownable {
         uint256 billing_id
     ) public payable paymentIdCheck(payment_id) paymentActiveCheck(payment_id) returns (bool) {
         require(
+            _payment_id_billing_id_to_payer_id[payment_id][billing_id] == 0,
+            "This payment all ready approved"
+        );
+        require(
             _payments[payment_id].is_native_token && msg.value ==_payments[payment_id].price ||
             !_payments[payment_id].is_native_token &&
             IERC20(_payments[payment_id].ERC20_address).allowance(_msgSender(), address(this)) >=
