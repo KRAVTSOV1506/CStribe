@@ -527,6 +527,10 @@ contract CryptoStribe is Context, Ownable {
         return _payments.length;
     }
 
+    function GetPayersLength() public view returns (uint256) {
+        return _payers.length;
+    }
+
     function IsPaymentActive(uint256 payment_id) public view returns (bool) {
         return _payments[payment_id].is_active;
     }
@@ -536,17 +540,12 @@ contract CryptoStribe is Context, Ownable {
     }
 
     function GetPayments(
-        uint256 from, 
-        uint256 to
+        uint256[] memory payment_ids
     ) public view returns (Payment[] memory) {
-        require(
-            0 < from && from < to && to <= GetPaymentsLength(), 
-            "Incorrect segment"
-        );
-        Payment[] memory payments = new Payment[](to - from);
+        Payment[] memory payments = new Payment[](payment_ids.length);
 
-        for (uint256 i = from; i < to; i++) {
-            payments[i - from] = _payments[i];
+        for (uint256 i = 0; i < payment_ids.length; i++) {
+            payments[i] = GetPayment(payment_ids[i]);
         }
 
         return payments;
@@ -557,6 +556,45 @@ contract CryptoStribe is Context, Ownable {
         uint256 billing_id
     ) public view returns(Payer memory) {   
         return _payers[_GetPayerId(payment_id, billing_id)];
+    }
+
+    function GetPayers(
+        uint256[] memory payment_ids,
+        uint256[] memory billing_ids
+    ) public view returns(Payer[] memory) {
+        require(
+            payment_ids.length == billing_ids.length,
+            "Arrays must have the same length"
+        );
+        Payer[] memory payers = new Payer[](payment_ids.length);
+
+        for (uint256 i = 0; i < payment_ids.length; i++) {
+            payers[i] =  _payers[_GetPayerId(payment_ids[i], billing_ids[i])];
+        }
+
+        return payers;
+    }
+
+    function GetPayerByPayerId(
+        uint256 payer_id
+    ) public view returns(Payer memory) {
+        require(
+            0 <= payer_id && payer_id < GetPayersLength(),
+            "Payer id incorrect"
+        );
+        return _payers[payer_id];
+    }
+
+    function GetPayersByPayersIds(
+        uint256[] memory payer_ids
+    ) public view returns(Payer[] memory) {
+        Payer[] memory payers = new Payer[](payer_ids.length);
+
+        for (uint256 i = 0; i < payer_ids.length; i++) {
+            payers[i] = GetPayerByPayerId(payer_ids[i]);
+        }
+
+        return payers;
     }
 
     function GetPayerStatus(
@@ -772,6 +810,10 @@ contract CryptoStribe is Context, Ownable {
         uint256 billing_id
     ) public paymentActiveCheck(payment_id) returns (bool) {
         uint256 payer_id = _GetPayerId(payment_id, billing_id);
+        require(
+            _payments[payment_id].payment_type == PaymentType.SUBSCRIPTION,
+            "Payment is not subscription"
+        );
         require(
             _payers[payer_id].payment_status == PaymentStatus.ACTIVE &&
             _payers[payer_id].last_payment_timestamp + _payments[payment_id].payment_period <=
