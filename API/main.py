@@ -105,7 +105,7 @@ def payment():
 
 
 @route('/payers_length')
-def payment():
+def payers_length():
     return json.dumps({
         "payers_length": GetPayersLength()
     })
